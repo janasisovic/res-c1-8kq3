@@ -1,53 +1,45 @@
 <!DOCTYPE html>
-<html lang="sr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rezultati</title>
+<title>Results</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 /* Layout: a score ledger. Header + legend, three skill tiles, then one table of tests; owner-only entry panel. */
 :root {
-  --bg: #f4f6fa;
+  --bg: #ffffff;
   --surface: #ffffff;
-  --ink: #18203a;
-  --muted: #5d6680;
-  --line: #dfe3ec;
+  --ink: #464b55;
+  --muted: #7d828b;
+  --line: #dcdcdc;
   --accent: #2647b8;
   --accent-soft: #e6ebfb;
-  --dot: #d3d9e6;
+  --dot: #e4e4e4;
+  --rf: #1f7a3f; --rf-bg: #e6f7ea; --rf-line: #b8e3c4;
+  --sb-track: #f1f1f1; --sb-thumb: #c9c9c9; --sb-thumb-hover: #a9a9a9;
   --pts: #6a3fc1; --pts-bg: #efe8fc;
   --pc: #b4407a; --pc-bg: #fde8f2;
-  --c2: #2647b8; --c2-bg: #e3e9fc;
-  --c1: #17804f; --c1-bg: #dff3e8;
-  --b2: #a86200; --b2-bg: #fbeedb;
+  --c2: #6d2a8b; --c2-bg: #f1e3f8;
+  --c1: #8f6400; --c1-bg: #fdefc4;
+  --b2: #00797c; --b2-bg: #d4f2f2; --b2-light: #2fb5b8;
   --low: #b3261e; --low-bg: #fbe3e1;
   --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #10141f; --surface: #181e2d; --ink: #e8ecf6; --muted: #9aa3bb; --line: #2a3246;
-    --accent: #8ea6ff; --accent-soft: #232d4d; --dot: #252c3e;
-    --pts: #c3a6ff; --pts-bg: #2e2347; --pc: #ff9fcb; --pc-bg: #3f2232;
-    --c2: #9fb3ff; --c2-bg: #24305a;
-    --c1: #5fd39a; --c1-bg: #173a2a;
-    --b2: #f0b45c; --b2-bg: #3d2c12;
-    --low: #ff8a80; --low-bg: #44201d;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
+:root[data-mode="dark"] {
   --bg: #10141f; --surface: #181e2d; --ink: #e8ecf6; --muted: #9aa3bb; --line: #2a3246;
   --accent: #8ea6ff; --accent-soft: #232d4d; --dot: #252c3e;
+  --sb-track: #1d2435; --sb-thumb: #3b4762; --sb-thumb-hover: #4d5b7c;
+  --rf: #8fe0a8; --rf-bg: #173524; --rf-line: #2a5a3c;
   --pts: #c3a6ff; --pts-bg: #2e2347; --pc: #ff9fcb; --pc-bg: #3f2232;
-  --c2: #9fb3ff; --c2-bg: #24305a;
-  --c1: #5fd39a; --c1-bg: #173a2a;
-  --b2: #f0b45c; --b2-bg: #3d2c12;
+  --c2: #d9a8f2; --c2-bg: #3b2150;
+  --c1: #f5c242; --c1-bg: #3e3112;
+  --b2: #4fd6d8; --b2-bg: #0f3a3b; --b2-light: #93e8e9;
   --low: #ff8a80; --low-bg: #44201d;
   color-scheme: dark;
 }
@@ -64,8 +56,23 @@ body {
 header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; }
 h1 { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1.1; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
 .sub { color: var(--muted); margin: 6px 0 0; }
-.legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; }
-.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-weight: 600; font-size: 12.5px; white-space: nowrap; }
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; padding: 8px 10px; border: 2px solid var(--line); border-radius: 0; background: var(--surface); }
+.mode { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.mode .sw { position: relative; width: 40px; height: 22px; padding: 0; border: 2px solid var(--ink); border-radius: 999px; background: var(--surface); cursor: pointer; }
+.mode .sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--ink); transition: transform 0.18s ease; transform: translateX(18px); }
+.mode .sw[aria-checked="true"]::after { transform: translateX(0); }
+.mode .on { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .mode .sw::after { transition: none; } }
+.hdr-right { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.refresh { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; font-size: 13px; font-weight: 600; color: var(--rf); background: var(--rf-bg); border: 1.5px solid var(--rf-line); }
+.refresh { border-radius: 6px; }
+.refresh:hover { border-color: var(--rf); }
+.refresh .ri { flex-shrink: 0; }
+.refresh.spinning .ri { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .refresh.spinning .ri { animation-duration: 2s; } }
+.legend .lt { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-right: 2px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 0; font-weight: 600; font-size: 12.5px; white-space: nowrap; }
 .chip.c2 { color: var(--c2); background: var(--c2-bg); }
 .chip.c1 { color: var(--c1); background: var(--c1-bg); }
 .chip.b2 { color: var(--b2); background: var(--b2-bg); }
@@ -73,14 +80,15 @@ h1 { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-h
 .chip.none { color: var(--muted); background: var(--bg); border: 1px solid var(--line); }
 
 .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: grid; gap: 4px; }
-.tile .k { color: var(--muted); font-size: 13px; font-weight: 500; }
+.tile { background: var(--surface); border: 2px solid var(--line); border-radius: 0; padding: 16px 18px; display: grid; gap: 4px; }
+.tile .k { color: var(--ink); font-size: 13px; font-weight: 700; }
+.tile .k .kl { font-weight: 400; color: var(--muted); }
 .tile .v { font-family: var(--font-display); font-size: 36px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .tile .d { color: var(--muted); font-size: 13px; }
 
 .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 h2 { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin: 0; }
-button { font: inherit; cursor: pointer; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 14px; }
+button { font: inherit; cursor: pointer; border-radius: 0; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 14px; }
 button:hover { border-color: var(--accent); }
 button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 button.primary { background: var(--accent); color: var(--surface); border-color: var(--accent); font-weight: 600; }
@@ -88,8 +96,13 @@ button.link { border: none; background: none; padding: 4px 6px; color: var(--mut
 button.link:hover { color: var(--accent); }
 button.danger { color: var(--low); }
 
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-.scroll { overflow-x: auto; }
+.card { background: var(--surface); border: 2px solid var(--line); border-radius: 0; overflow: hidden; }
+.scroll { overflow-x: auto; scrollbar-color: var(--sb-thumb) var(--sb-track); scrollbar-width: thin; }
+.scroll::-webkit-scrollbar { height: 8px; }
+.scroll::-webkit-scrollbar-track { background: var(--sb-track); }
+.scroll::-webkit-scrollbar-thumb { background: var(--sb-thumb); }
+.scroll::-webkit-scrollbar-thumb:hover { background: var(--sb-thumb-hover); }
+.scroll::-webkit-scrollbar-button { display: none; }
 table { width: 100%; border-collapse: collapse; min-width: 920px; }
 th { text-align: left; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 14px 16px; border-bottom: 1px solid var(--line); background: var(--surface); white-space: nowrap; }
 th small { font-weight: 400; text-transform: none; letter-spacing: 0; }
@@ -102,12 +115,13 @@ td { padding: 16px; border-bottom: 1px solid var(--line); vertical-align: middle
 tr:last-child td { border-bottom: none; }
 .test { white-space: nowrap; }
 .test b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 15.5px; }
-.test span { display: inline-block; margin-top: 3px; color: var(--accent); background: var(--accent-soft); font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 6px; }
+.test span { display: inline-block; box-sizing: border-box; width: 64px; text-align: center; margin-top: 4px; color: var(--accent); background: var(--accent-soft); border: 1.5px solid var(--accent); font-size: 12px; font-weight: 600; padding: 1px 0; border-radius: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .score { display: grid; gap: 6px; justify-items: start; white-space: nowrap; }
-.split { display: inline-flex; border-radius: 8px; overflow: hidden; font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; border: 1px solid var(--line); }
-.split span { padding: 2px 9px; }
+.split { display: inline-flex; gap: 6px; font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.split span { padding: 2px 10px; border-radius: 0; font-weight: 500; }
 .split .p1 { color: var(--pts); background: var(--pts-bg); }
-.split .p2 { color: var(--pc); background: var(--pc-bg); border-left: 1px solid var(--line); }
+.split .p2 { color: var(--pc); background: var(--pc-bg); }
+.chip, .split .p1, .split .p2 { border-radius: 999px; }
 .score .chip { font-family: var(--font-display); font-size: 15px; padding: 4px 12px; font-variant-numeric: tabular-nums; }
 .split { white-space: nowrap; flex-shrink: 0; }
 .dash { color: var(--muted); }
@@ -116,19 +130,23 @@ tr:last-child td { border-bottom: none; }
 .actions { white-space: nowrap; text-align: right; }
 .empty { padding: 40px 20px; text-align: center; color: var(--muted); }
 
-.panel { background: var(--surface); border: 1px solid var(--accent); border-radius: 14px; padding: 20px; display: grid; gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--accent); border-radius: 0; padding: 20px; display: grid; gap: 16px; }
 .panel[hidden] { display: none; }
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .field { display: grid; gap: 6px; }
 .field label { font-size: 13px; font-weight: 500; color: var(--muted); }
-input, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; width: 100%; }
+input, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 0; padding: 9px 12px; width: 100%; }
 textarea { min-height: 64px; resize: vertical; }
 .field .pv { font-size: 12.5px; color: var(--muted); min-height: 1.4em; }
 .row-end { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 .err { color: var(--low); font-size: 13.5px; }
 
 footer { color: var(--muted); font-size: 13.5px; display: grid; gap: 8px; }
-footer table { min-width: 0; width: auto; font-size: 13px; }
+footer table { min-width: 0; width: auto; font-size: 13px; border: 1.5px solid var(--b2); border-top-width: 4px; border-radius: 0; border-collapse: separate; border-spacing: 0; overflow: hidden; background: var(--surface); }
+footer tbody tr:last-child th, footer tbody tr:last-child td { border-bottom: none; }
+footer th + th, footer th + td, footer td + td { border-left: 1px solid var(--line); }
+footer thead th { background: var(--bg); }
+footer .mx { font-weight: 800; color: var(--ink); }
 footer th, footer td { padding: 6px 12px; border-bottom: 1px solid var(--line); }
 footer td { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .status { color: var(--muted); font-size: 13.5px; }
@@ -147,22 +165,30 @@ footer td { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 <div class="wrap">
   <header>
     <div>
-      <h1>Rezultati</h1>
+      <h1>Results</h1>
     </div>
-    <div class="legend" aria-label="Nivoi">
-      <span class="chip c2">200+ C2</span>
-      <span class="chip c1">180–199 C1</span>
+    <div class="hdr-right">
+    <div class="mode" role="group" aria-label="Theme">
+      <span id="lblDark" title="Dark" aria-label="Dark" style="display:inline-flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span>
+      <button type="button" class="sw" id="modeSw" role="switch" aria-checked="false" aria-label="Dark theme"></button>
+      <span id="lblLight" class="on" title="Light" aria-label="Light" style="display:inline-flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path d="M12 1.5v2.5M12 20v2.5M1.5 12h2.5M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg></span>
+    </div>
+    <div class="legend" aria-label="Levels">
+      <span class="lt">Levels</span>
+      <span class="chip low">below 160</span>
       <span class="chip b2">160–179 B2</span>
-      <span class="chip low">ispod 160</span>
+      <span class="chip c1">180–199 C1</span>
+      <span class="chip c2">200+ C2</span>
+    </div>
     </div>
   </header>
 
   <section style="display:grid; gap:14px;">
     <div class="bar">
-      <h2>Svi testovi</h2>
+      <h2>All tests</h2>
       <div style="display:flex; gap:12px; align-items:center;">
-        <span class="status" id="status">Učitavam…</span>
-        <button id="refreshBtn" type="button">Osveži</button>
+        <span class="status" id="status">Loading…</span>
+        <button id="refreshBtn" type="button" class="refresh">Refresh</button>
       </div>
     </div>
 
@@ -170,39 +196,42 @@ footer td { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
     <div class="card"><div class="scroll">
       <table>
         <thead><tr>
-          <th>Knjiga i test</th>
+          <th>Book and test</th>
           <th>Reading</th>
           <th>Use of English</th>
           <th>Listening</th>
-          <th>Datum</th>
-          <th>Napomena</th>
+          <th>Date</th>
+          <th>Note</th>
         </tr></thead>
-        <tbody id="rows"><tr><td colspan="6" class="empty">Učitavam rezultate…</td></tr></tbody>
+        <tbody id="rows"><tr><td colspan="6" class="empty">Loading results…</td></tr></tbody>
       </table>
     </div></div>
   </section>
 
   <section style="display:grid; gap:14px;">
-    <h2>Poslednji rezultati po delovima</h2>
+    <h2>Latest results by section</h2>
     <div class="tiles" id="tiles"></div>
   </section>
 
   <footer>
-    <div>Kako se računa: za svaki deo uzmu se dve susedne tačke iz zvanične Cambridge tabele za testove za vežbanje, a između njih skor raste linearno. Primer: Reading 33/50 → 180 + (33 − 32) / (43 − 32) · 20 ≈ 182.</div>
+    <div><span style="color: var(--b2-light); font-weight: 600;">How it is calculated:</span> for each section, the two nearest points from the official Cambridge conversion table for practice tests are taken, and the score rises linearly between them. Example: Reading 33/50 → 180 + (33 − 32) / (43 − 32) · 20 ≈ 182.</div>
     <div class="scroll"><table>
-      <thead><tr><th>Cambridge skor</th><th>142</th><th>160</th><th>180</th><th>200</th><th>210</th></tr></thead>
+      <thead><tr><th>Cambridge score</th><th>142</th><th>160</th><th>180</th><th>200</th><th>210</th></tr></thead>
       <tbody>
-        <tr><th>Reading /50</th><td>17</td><td>23</td><td>32</td><td>43</td><td>50</td></tr>
-        <tr><th>Use of English /28</th><td>8</td><td>11</td><td>16</td><td>23</td><td>28</td></tr>
-        <tr><th>Listening /30</th><td>11</td><td>13</td><td>18</td><td>26</td><td>30</td></tr>
+        <tr><th>Reading <span class="mx">/50</span></th><td>17</td><td>23</td><td>32</td><td>43</td><td>50</td></tr>
+        <tr><th>Use of English <span class="mx">/28</span></th><td>8</td><td>11</td><td>16</td><td>23</td><td>28</td></tr>
+        <tr><th>Listening <span class="mx">/30</span></th><td>11</td><td>13</td><td>18</td><td>26</td><td>30</td></tr>
       </tbody>
     </table></div>
   </footer>
 </div>
 
 <script>
-// Link do Google tabele objavljene kao CSV (File → Share → Publish to web → .csv)
+// Link to the Google Sheet published as CSV (File → Share → Publish to web → .csv)
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSaT9RpB4E9Q-KbpH0eRh-vlPDv1kMoFmUC1fzEVqSO0KcVGqhhKsA2Gl0uk7lHXNWUi4Ok32jiFmpw/pub?gid=0&single=true&output=csv";
+
+// Preview only: if CSV text is set here, the page uses it instead of the Google Sheet.
+const PREVIEW_CSV = null;
 
 const SKILLS = [
   { key: "reading",   name: "Reading",        col: "reading",        max: 50, pts: [17, 23, 32, 43, 50] },
@@ -229,11 +258,12 @@ function level(s) {
   if (v >= 160) return { cls: "b2", label: v + " · B2" };
   return { cls: "low", label: String(v) };
 }
-function pct(raw, max) { return (raw / max * 100).toFixed(1).replace(".", ",") + " %"; }
+function pct(raw, max) { return (raw / max * 100).toFixed(1) + "\u202f%"; }
 function fmtDate(d) {
   if (!d) return "";
   const [y, m, day] = d.split("-");
-  return Number(day) + ". " + Number(m) + ". " + y + ".";
+  const M = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return Number(day) + " " + M[Number(m) - 1] + " " + y;
 }
 function el(tag, cls, text) {
   const e = document.createElement(tag);
@@ -323,23 +353,25 @@ function renderTiles() {
   SKILLS.forEach(sk => {
     const withVal = results.filter(r => r[sk.key] !== null);
     const tile = el("div", "tile");
-    tile.append(el("div", "k", sk.name + " · poslednji test"));
+    const kk = el("div", "k", sk.name);
+    kk.append(el("span", "kl", " · latest test"));
+    tile.append(kk);
     const v = el("div", "v");
     if (withVal.length) {
       const last = withVal[0];
       const s = cse(last[sk.key], sk.pts), lv = level(s);
       v.append(document.createTextNode(s.below ? "<142" : String(s.value)));
-      v.append(el("span", "chip " + lv.cls, lv.cls === "low" ? "ispod B2" : lv.label.split(" · ")[1]));
+      v.append(el("span", "chip " + lv.cls, lv.cls === "low" ? "below B2" : lv.label.split(" · ")[1]));
       tile.append(v);
       const best = Math.max(...withVal.map(r => { const x = cse(r[sk.key], sk.pts); return x.below ? 0 : x.value; }));
       const d = el("div", "d");
       d.style.display = "flex"; d.style.flexWrap = "wrap"; d.style.gap = "8px"; d.style.alignItems = "center";
-      d.append(split(last[sk.key], sk.max), el("span", "", last.book + ", " + last.test + " · najbolji: " + (best || "<142")));
+      d.append(split(last[sk.key], sk.max), el("span", "", last.book + ", " + last.test + " · best: " + (best || "<142")));
       tile.append(d);
     } else {
       v.append(el("span", "dash", "—"));
       tile.append(v);
-      tile.append(el("div", "d", "Još nema unetih rezultata"));
+      tile.append(el("div", "d", "No results yet"));
     }
     wrap.append(tile);
   });
@@ -348,7 +380,7 @@ function renderRows(msg) {
   const body = document.getElementById("rows");
   body.replaceChildren();
   if (msg || !results.length) {
-    const tr = el("tr"), td = el("td", "empty", msg || "Još nema unetih rezultata.");
+    const tr = el("tr"), td = el("td", "empty", msg || "No results yet.");
     td.colSpan = 6; tr.append(td); body.append(tr); return;
   }
   results.forEach(r => {
@@ -363,9 +395,13 @@ function renderRows(msg) {
 function setStatus(t) { document.getElementById("status").textContent = t; }
 
 async function load() {
-  setStatus("Učitavam…");
+  setStatus("Loading…");
+  if (PREVIEW_CSV) {
+    results = rowsToResults(parseCSV(PREVIEW_CSV)); renderRows(); renderTiles();
+    setStatus(results.length + (results.length === 1 ? " test" : " tests")); return;
+  }
   if (CSV_URL.indexOf("http") !== 0) {
-    results = []; renderRows("Stranica još nije povezana sa Google tabelom."); renderTiles(); setStatus(""); return;
+    results = []; renderRows("This page is not connected to the Google Sheet yet."); renderTiles(); setStatus(""); return;
   }
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 15000);
@@ -375,14 +411,34 @@ async function load() {
     if (!res.ok) throw new Error(res.status);
     results = rowsToResults(parseCSV(await res.text()));
     renderRows(); renderTiles();
-    const now = new Date();
-    setStatus(results.length + (results.length === 1 ? " test" : " testova") + " · učitano u " + String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0"));
+    setStatus(results.length + (results.length === 1 ? " test" : " tests"));
   } catch (e) {
-    renderRows("Rezultati trenutno ne mogu da se učitaju. Proveri internet i klikni „Osveži“."); renderTiles();
+    renderRows("Results cannot be loaded right now. Check your internet connection and click Refresh."); renderTiles();
     setStatus("");
   } finally { clearTimeout(timer); }
 }
-document.getElementById("refreshBtn").addEventListener("click", load);
+document.getElementById("refreshBtn").addEventListener("click", async () => {
+  const b = document.getElementById("refreshBtn");
+  if (b.classList.contains("spinning")) return;
+  b.classList.add("spinning");
+  const minSpin = new Promise(r => setTimeout(r, 800));
+  await Promise.all([load(), minSpin]);
+  b.classList.remove("spinning");
+});
+
+// ---------- light / dark ----------
+function setMode(m, save) {
+  document.documentElement.setAttribute("data-mode", m);
+  document.getElementById("modeSw").setAttribute("aria-checked", m === "dark" ? "true" : "false");
+  document.getElementById("lblLight").className = m === "light" ? "on" : "";
+  document.getElementById("lblDark").className = m === "dark" ? "on" : "";
+  if (save) { try { localStorage.setItem("c1-mode", m); } catch (e) {} }
+}
+let savedMode = null;
+try { savedMode = localStorage.getItem("c1-mode"); } catch (e) {}
+setMode(savedMode === "dark" ? "dark" : "light", false);
+document.getElementById("modeSw").addEventListener("click", () =>
+  setMode(document.documentElement.getAttribute("data-mode") === "dark" ? "light" : "dark", true));
 load();
 </script>
 </body>
